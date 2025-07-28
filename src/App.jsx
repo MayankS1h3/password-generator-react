@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import "./App.css";
 
 function App() {
@@ -21,6 +21,14 @@ function App() {
     setPassword(pass);
   }, [length, numbersAllowed, charsAllowed, setPassword]);
 
+  const passwordRef = useRef(null)
+
+  const copyPasswordToClipboard = useCallback(() => {
+    passwordRef.current?.select()
+    passwordRef.current?.setSelectionRange(0, password.length);
+    window.navigator.clipboard.writeText(password)
+  },[password])
+
   useEffect(
     () => passwordGenerator(),
     [length, numbersAllowed, charsAllowed, passwordGenerator]
@@ -40,9 +48,13 @@ function App() {
               placeholder="password"
               value={password}
               readOnly
+              ref={passwordRef}
               className="flex-grow bg-gray-800 px-4 py-2 text-yellow-200 placeholder-gray-400 focus:outline-none"
             />
-            <button className="bg-yellow-500 hover:bg-yellow-600 px-4 text-sm font-medium">
+            <button 
+            type="button"
+            onClick={copyPasswordToClipboard}
+            className="bg-yellow-500 hover:bg-yellow-600 px-4 text-sm font-medium">
               Copy
             </button>
           </div>
@@ -54,7 +66,7 @@ function App() {
                 min={8}
                 max={15}
                 value={length}
-                onChange={(e) => setLength(parseInt(e.target.value), 10)}
+                onChange={(e) => setLength(parseInt(e.target.value, 10))}
                 className="w-full accent-yellow-500"
               />
               <label className="whitespace-nowrap text-sm">
