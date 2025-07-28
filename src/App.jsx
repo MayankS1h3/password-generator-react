@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import "./App.css";
 
 function App() {
@@ -6,6 +6,25 @@ function App() {
   const [numbersAllowed, setNumbersAllowed] = useState(true);
   const [charsAllowed, setCharsAllowed] = useState(true);
   const [password, setPassword] = useState("");
+
+  const passwordGenerator = useCallback(() => {
+    let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    let pass = "";
+
+    if (numbersAllowed) str += "0123456789";
+    if (charsAllowed) str += "~!@#$%^&*";
+
+    for (let i = 0; i < length; i++) {
+      let idx = Math.floor(Math.random() * str.length);
+      pass += str[idx];
+    }
+    setPassword(pass);
+  }, [length, numbersAllowed, charsAllowed, setPassword]);
+
+  useEffect(
+    () => passwordGenerator(),
+    [length, numbersAllowed, charsAllowed, passwordGenerator]
+  );
 
   return (
     <>
@@ -35,7 +54,7 @@ function App() {
                 min={8}
                 max={15}
                 value={length}
-                onChange={(e) => setLength(e.target.value)}
+                onChange={(e) => setLength(parseInt(e.target.value), 10)}
                 className="w-full accent-yellow-500"
               />
               <label className="whitespace-nowrap text-sm">
@@ -46,7 +65,7 @@ function App() {
             <div className="flex items-center gap-1">
               <input
                 type="checkbox"
-                defaultValue={numbersAllowed}
+                checked={numbersAllowed}
                 onChange={() => setNumbersAllowed((prev) => !prev)}
                 className="h-4 w-4 accent-yellow-500"
               />
@@ -56,7 +75,7 @@ function App() {
             <div className="flex items-center gap-1">
               <input
                 type="checkbox"
-                defaultValue={charsAllowed}
+                checked={charsAllowed}
                 onChange={() => setCharsAllowed((prev) => !prev)}
                 className="h-4 w-4 accent-yellow-500"
               />
